@@ -39,21 +39,23 @@
     <!-- Main Content -->
     <main class="max-w-6xl mx-auto p-4">
         
-        <!-- Live Video News Player -->
+        <!-- Fixed Live Video News Player -->
         <section class="mb-8 bg-gray-900 text-white rounded-2xl p-4 shadow-xl border border-gray-800">
             <div class="flex justify-between items-center mb-3">
                 <h3 class="text-base font-bold text-red-500 flex items-center gap-2">
                     <span class="w-3 h-3 bg-red-600 rounded-full animate-ping"></span> 📺 24x7 लाइव वीडियो न्यूज़ TV
                 </h3>
-                <span class="text-xs text-gray-400">ऑन-साइट प्ले</span>
+                <span class="text-xs text-gray-400">ऑन-साइट स्ट्रीम</span>
             </div>
-            <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
-                <iframe id="video-player" class="w-full h-full" src="https://www.youtube.com/embed/live_stream?channel=UC9CYT9gSNLevXqe3zVd0y3w&autoplay=0" title="Live News" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            
+            <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-inner">
+                <iframe id="video-player" class="w-full h-full" src="https://www.youtube-nocookie.com/embed/fJ9rUzIMcZQ?autoplay=0&rel=0" title="Aaj Tak Live" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
+            
             <div class="flex gap-2 mt-3 overflow-x-auto text-xs">
-                <button onclick="switchVideo('UC9CYT9gSNLevXqe3zVd0y3w')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold">Aaj Tak Live</button>
-                <button onclick="switchVideo('UCmP4A142Mox3iA2SksP19vg')" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg font-bold">ABP News Live</button>
-                <button onclick="switchVideo('UC4L_I4K3O3-S2_a-QjSg36Q')" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg font-bold">TV9 Bharatvarsh Live</button>
+                <button onclick="switchVideo('fJ9rUzIMcZQ', this)" class="v-btn bg-red-600 text-white px-3.5 py-2 rounded-lg font-bold shadow">Aaj Tak Live</button>
+                <button onclick="switchVideo('nyd-xznHpMU', this)" class="v-btn bg-gray-800 hover:bg-gray-700 text-white px-3.5 py-2 rounded-lg font-bold">ABP News Live</button>
+                <button onclick="switchVideo('L93-d14S-B0', this)" class="v-btn bg-gray-800 hover:bg-gray-700 text-white px-3.5 py-2 rounded-lg font-bold">TV9 Bharatvarsh Live</button>
             </div>
         </section>
 
@@ -71,7 +73,7 @@
         </div>
     </main>
 
-    <!-- Enhanced In-Page News Modal -->
+    <!-- In-Page News Modal -->
     <div id="news-modal" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 relative max-h-[85vh] overflow-y-auto shadow-2xl">
             <button onclick="closeModal()" class="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full w-9 h-9 flex items-center justify-center font-bold text-xl">&times;</button>
@@ -133,8 +135,14 @@
         let currentItems = [];
         let currentCategory = 'MAIN';
 
-        function switchVideo(channelId) {
-            document.getElementById('video-player').src = `https://www.youtube.com/embed/live_stream?channel=${channelId}&autoplay=1`;
+        function switchVideo(videoId, btn) {
+            document.getElementById('video-player').src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+            document.querySelectorAll('.v-btn').forEach(b => {
+                b.classList.remove('bg-red-600');
+                b.classList.add('bg-gray-800');
+            });
+            btn.classList.remove('bg-gray-800');
+            btn.classList.add('bg-red-600');
         }
 
         function extractImage(item) {
@@ -172,21 +180,19 @@
             const fetchPromises = urls.map(url => fetchFeed(url));
             const results = await Promise.all(fetchPromises);
             
-            // Merge & deduplicate news
             let combined = results.flat();
             const seen = new Set();
             currentItems = combined.filter(item => {
                 const isDuplicate = seen.has(item.title);
                 seen.add(item.title);
                 return !isDuplicate;
-            }).slice(0, 50); // Fetch up to 50 items
+            }).slice(0, 50);
 
             document.getElementById('news-count').innerText = `${currentItems.length} खबरें`;
 
             if (currentItems.length > 0) {
                 document.getElementById('ticker').innerText = currentItems[0].title;
                 
-                // Hero Banner
                 const heroItem = currentItems[0];
                 heroBanner.innerHTML = `
                     <div onclick="openModal(0)" class="cursor-pointer bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-red-600 hover:shadow-2xl transition">
@@ -200,7 +206,6 @@
                 `;
                 heroBanner.classList.remove('hidden');
 
-                // News Grid (50 items)
                 newsList.innerHTML = currentItems.slice(1).map((item, index) => {
                     const actualIndex = index + 1;
                     return `
