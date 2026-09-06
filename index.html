@@ -9,10 +9,10 @@
 <body class="bg-gray-100 text-gray-800">
 
     <!-- Header -->
-    <header class="bg-white shadow">
+    <header class="bg-white shadow sticky top-0 z-40">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <h1 class="text-3xl font-black text-red-600">🔴 भारत <span class="text-gray-900">न्यूज़</span></h1>
-            <span class="text-xs text-green-600 font-bold bg-green-100 px-2 py-1 rounded">● लाइव फ़ीड</span>
+            <span class="text-xs text-green-600 font-bold bg-green-100 px-2 py-1 rounded">● लाइव पोर्टेबल फ़ीड</span>
         </div>
         
         <!-- Category Navbar -->
@@ -32,30 +32,41 @@
     <div class="bg-red-600 text-white py-2 px-4 font-bold text-sm">
         <div class="max-w-4xl mx-auto flex items-center gap-2">
             <span class="bg-white text-red-600 text-xs px-2 py-0.5 rounded uppercase">ब्रेकिंग</span>
-            <div id="ticker" class="truncate font-normal">खबरें लोड हो रही हैं...</div>
+            <div id="ticker" class="truncate font-normal">ताज़ा खबरें लोड हो रही हैं...</div>
         </div>
     </div>
 
     <!-- Main Content -->
     <main class="max-w-4xl mx-auto p-4">
+        
+        <!-- Featured Hero Banner Section -->
+        <div id="hero-banner" class="mb-6 hidden">
+            <!-- Hero news card inserted via JS -->
+        </div>
+
         <h2 id="category-title" class="text-xl font-bold mb-4 border-l-4 border-red-600 pl-2">मुख्य समाचार</h2>
 
-        <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- News Grid -->
+        <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <p class="text-gray-500 col-span-2 text-center py-6">खबरें लोड हो रही हैं, कृपया प्रतीक्षा करें...</p>
         </div>
     </main>
 
-    <!-- Modal Popup for Reading News On-Site -->
-    <div id="news-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-lg w-full p-6 relative max-h-[80vh] overflow-y-auto shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-3 right-3 text-gray-500 hover:text-black text-2xl font-bold">&times;</button>
-            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded">न्यूज़ विवरण</span>
+    <!-- Strictly In-Page Modal (No External Links) -->
+    <div id="news-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 relative max-h-[85vh] overflow-y-auto shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-3 right-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center font-bold">&times;</button>
+            
+            <img id="modal-img" class="w-full h-48 object-cover rounded-xl mb-4" src="" alt="News Image">
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-md">🔴 भारत न्यूज़ एक्सक्लूसिव</span>
+            
             <h3 id="modal-title" class="text-lg font-bold text-gray-900 mt-3 mb-2 leading-snug"></h3>
             <p id="modal-date" class="text-xs text-gray-400 mb-4"></p>
-            <div id="modal-body" class="text-sm text-gray-700 space-y-2 border-t pt-3"></div>
-            <div class="mt-6 flex justify-between items-center gap-2">
-                <button onclick="closeModal()" class="bg-gray-200 text-gray-800 text-xs px-4 py-2 rounded-lg font-bold">बंद करें</button>
-                <a id="modal-link" href="#" target="_blank" class="bg-red-600 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-red-700">मूल स्रोत पर जाएँ &rarr;</a>
+            
+            <div id="modal-body" class="text-sm text-gray-700 leading-relaxed border-t pt-3 space-y-2"></div>
+            
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal()" class="bg-red-600 text-white text-xs px-6 py-2.5 rounded-lg font-bold hover:bg-red-700 shadow">बंद करें</button>
             </div>
         </div>
     </div>
@@ -63,9 +74,10 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-white text-center py-6 mt-8 text-sm">
         <p class="font-bold text-red-500">🔴 भारत न्यूज़ नेटवर्क</p>
+        <p class="text-gray-400 text-xs mt-1">सर्वाधिकार सुरक्षित © 2026 | केवल ऑन-साइट लाइव समाचार</p>
     </footer>
 
-    <!-- Auto Fetch, Crypto & Modal Script -->
+    <!-- Auto Fetch & Image Processing Script -->
     <script>
         const feeds = {
             'MAIN': 'https://news.google.com/rss?hl=hi&gl=IN&ceid=IN:hi',
@@ -76,11 +88,44 @@
             'BUSINESS': 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=hi&gl=IN&ceid=IN:hi'
         };
 
+        const defaultBanners = {
+            'MAIN': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80',
+            'CRYPTO': 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80',
+            'SPORTS': 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80',
+            'ENTERTAINMENT': 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
+            'TECHNOLOGY': 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+            'BUSINESS': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80'
+        };
+
         let currentItems = [];
+        let currentCategory = 'MAIN';
+
+        function extractImage(item) {
+            if (item.thumbnail && item.thumbnail.startsWith('http')) return item.thumbnail;
+            if (item.enclosure && item.enclosure.link) return item.enclosure.link;
+            
+            const match = item.description ? item.description.match(/<img[^>]+src=["']([^"']+)["']/i) : null;
+            if (match && match[1]) return match[1];
+            
+            return defaultBanners[currentCategory] || defaultBanners['MAIN'];
+        }
+
+        function cleanText(html) {
+            if (!html) return 'इस खबर का विस्तृत विवरण उपलब्ध नहीं है।';
+            // Remove external <a> links so user cannot click out to BBC or third parties
+            let text = html.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '$1');
+            // Remove inline images from text description to avoid duplicate broken images
+            text = text.replace(/<img[^>]*>/gi, '');
+            return text;
+        }
 
         async function loadNews(categoryKey = 'MAIN') {
+            currentCategory = categoryKey;
             const newsList = document.getElementById('news-list');
+            const heroBanner = document.getElementById('hero-banner');
+            
             newsList.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-6">खबरें लोड हो रही हैं...</p>';
+            heroBanner.classList.add('hidden');
 
             const rssUrl = encodeURIComponent(feeds[categoryKey]);
             const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
@@ -92,15 +137,41 @@
                 if (data.status === 'ok' && data.items.length > 0) {
                     currentItems = data.items;
                     document.getElementById('ticker').innerText = data.items[0].title;
-                    newsList.innerHTML = data.items.slice(0, 15).map((item, index) => `
-                        <div class="bg-white p-4 rounded-lg shadow hover:shadow-md transition border-l-4 border-red-600 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-bold text-base text-gray-900 mb-2 leading-snug">${item.title}</h3>
-                                <p class="text-xs text-gray-500 mb-3">${new Date(item.pubDate).toLocaleString('hi-IN')}</p>
+                    
+                    // Render Top Hero Banner for 1st news item
+                    const heroItem = data.items[0];
+                    const heroImg = extractImage(heroItem);
+                    heroBanner.innerHTML = `
+                        <div onclick="openModal(0)" class="cursor-pointer bg-white rounded-xl shadow-lg overflow-hidden border-2 border-red-600 hover:shadow-2xl transition">
+                            <img src="${heroImg}" class="w-full h-56 md:h-64 object-cover" alt="Banner News">
+                            <div class="p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white -mt-20 relative z-10">
+                                <span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">बड़ी ख़बर</span>
+                                <h3 class="font-black text-lg md:text-xl mt-1 leading-snug">${heroItem.title}</h3>
+                                <p class="text-xs text-gray-300 mt-1">${new Date(heroItem.pubDate).toLocaleString('hi-IN')}</p>
                             </div>
-                            <button onclick="openModal(${index})" class="text-xs text-red-600 font-bold hover:underline text-left">खबर पढ़ें (पॉप-अप) &rarr;</button>
                         </div>
-                    `).join('');
+                    `;
+                    heroBanner.classList.remove('hidden');
+
+                    // Render Grid Cards for remaining news
+                    newsList.innerHTML = data.items.slice(1, 15).map((item, index) => {
+                        const actualIndex = index + 1;
+                        const img = extractImage(item);
+                        return `
+                            <div onclick="openModal(${actualIndex})" class="cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition border border-gray-200 overflow-hidden flex flex-col justify-between">
+                                <div>
+                                    <img src="${img}" class="w-full h-40 object-cover" alt="News thumbnail">
+                                    <div class="p-4">
+                                        <h3 class="font-bold text-base text-gray-900 mb-2 leading-snug">${item.title}</h3>
+                                        <p class="text-xs text-gray-500">${new Date(item.pubDate).toLocaleString('hi-IN')}</p>
+                                    </div>
+                                </div>
+                                <div class="px-4 pb-4">
+                                    <button class="w-full bg-gray-100 hover:bg-red-50 text-red-600 font-bold text-xs py-2 rounded-lg border border-red-200 text-center">खबर पढ़ें (पॉप-अप) &rarr;</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
                 } else {
                     throw new Error('Data empty');
                 }
@@ -113,10 +184,10 @@
             const item = currentItems[index];
             if (!item) return;
 
+            document.getElementById('modal-img').src = extractImage(item);
             document.getElementById('modal-title').innerText = item.title;
             document.getElementById('modal-date').innerText = new Date(item.pubDate).toLocaleString('hi-IN');
-            document.getElementById('modal-body').innerHTML = item.description || 'विवरण उपलब्ध नहीं है।';
-            document.getElementById('modal-link').href = item.link;
+            document.getElementById('modal-body').innerHTML = cleanText(item.description);
 
             const modal = document.getElementById('news-modal');
             modal.classList.remove('hidden');
