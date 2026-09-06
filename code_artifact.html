@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>भारत न्यूज़ | ताज़ा हिंदी समाचार, Latest Hindi News</title>
+    
+    <!-- Google Fonts: Noto Sans Devanagari -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans Devanagari"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#e60000',
+                            dark: '#1a1a1a',
+                            light: '#f4f4f4'
+                        }
+                    },
+                    animation: {
+                        'marquee': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for a premium look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .nav-link.active {
+            color: #e60000;
+            border-bottom: 2px solid #e60000;
+        }
+    </style>
+</head>
+<body class="bg-brand-light text-gray-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Top Bar -->
+    <div class="bg-brand-dark text-white text-xs py-2 hidden md:block">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div id="current-date" class="font-medium text-gray-300"></div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="hover:text-brand-red transition-colors"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+                <a href="#" class="hover:text-brand-red transition-colors"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                <a href="#" class="hover:text-brand-red transition-colors"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                <a href="#" class="hover:text-brand-red transition-colors"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="flex items-center space-x-2" onclick="filterCategory('होम')">
+                <div class="bg-brand-red text-white p-2 rounded-lg">
+                    <i data-lucide="newspaper" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-extrabold text-brand-dark leading-tight tracking-tighter">भारत<span class="text-brand-red">न्यूज़</span></h1>
+                    <p class="text-[10px] uppercase tracking-widest text-gray-500 font-semibold -mt-1">सबसे तेज़, सबसे सच</p>
+                </div>
+            </a>
+
+            <!-- Search & Actions (Desktop) -->
+            <div class="hidden md:flex items-center space-x-6">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="ख़बरें खोजें..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red w-64 text-sm transition-all">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-4 top-3 text-gray-400"></i>
+                </div>
+                <button class="bg-brand-red hover:bg-red-700 text-white px-4 py-2 rounded-full font-bold text-sm flex items-center space-x-2 transition-colors">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                    </span>
+                    <span>Live TV</span>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 hover:text-brand-red focus:outline-none">
+                <i data-lucide="menu" class="w-7 h-7"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Categories -->
+        <nav class="border-t border-gray-100 hidden md:block" id="desktop-nav">
+            <div class="container mx-auto px-4">
+                <ul class="flex space-x-8 text-sm font-bold text-gray-700 overflow-x-auto" id="category-menu">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Mobile Navigation (Hidden by default) -->
+        <nav id="mobile-nav" class="hidden md:hidden bg-white border-t border-gray-100 p-4 shadow-lg absolute w-full left-0">
+             <div class="mb-4 relative">
+                <input type="text" id="mobile-search-input" placeholder="खोजें..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red w-full text-sm">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-gray-400"></i>
+            </div>
+            <ul class="flex flex-col space-y-4 text-base font-bold text-gray-700" id="mobile-category-menu">
+                <!-- Populated by JS -->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Breaking News Ticker -->
+    <div class="bg-brand-red text-white flex items-center overflow-hidden h-10 border-b-2 border-red-800">
+        <div class="bg-red-800 h-full px-4 flex items-center font-bold text-sm z-10 whitespace-nowrap shadow-md">
+            <i data-lucide="zap" class="w-4 h-4 mr-2"></i> ब्रेकिंग न्यूज़
+        </div>
+        <div class="flex-1 overflow-hidden relative h-full flex items-center">
+            <div id="ticker-content" class="animate-marquee whitespace-nowrap text-sm flex space-x-8">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        
+        <!-- Section Title (Dynamic) -->
+        <div class="flex items-center justify-between mb-6">
+            <h2 id="section-title" class="text-2xl font-extrabold text-brand-dark border-l-4 border-brand-red pl-3 uppercase">होम</h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Side: Hero and Grid (Takes up 8 columns on large screens) -->
+            <div class="lg:col-span-8 space-y-8">
+                
+                <!-- Hero Section -->
+                <div id="hero-section" class="bg-white rounded-xl shadow-sm overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- News Grid -->
+                <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- No Results Message -->
+                <div id="no-results" class="hidden text-center py-12">
+                    <i data-lucide="search-x" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                    <h3 class="text-xl font-bold text-gray-500">कोई ख़बर नहीं मिली</h3>
+                    <p class="text-gray-400 mt-2">कृपया किसी अन्य कीवर्ड से खोजें या दूसरी श्रेणी चुनें।</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Sidebar (Takes up 4 columns on large screens) -->
+            <aside class="lg:col-span-4 space-y-8">
+                
+                <!-- Latest News Sidebar -->
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                    <div class="flex items-center justify-between mb-5 border-b border-gray-200 pb-2">
+                        <h3 class="text-lg font-bold text-brand-dark flex items-center">
+                            <span class="bg-brand-red w-2 h-2 rounded-full mr-2 animate-pulse"></span>
+                            ताज़ा ख़बरें
+                        </h3>
+                        <button onclick="filterCategory('ताज़ा ख़बरें')" class="text-xs font-semibold text-brand-red hover:underline">सभी देखें</button>
+                    </div>
+                    <div id="sidebar-latest" class="space-y-4 divide-y divide-gray-100">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Ad Banner Placeholder -->
+                <div class="bg-gray-200 rounded-xl flex items-center justify-center h-64 text-gray-400 font-bold border border-gray-300">
+                    विज्ञापन (Ad Space)
+                </div>
+
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-dark text-white pt-12 pb-6 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 border-b border-gray-800 pb-8">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-brand-red text-white p-1.5 rounded-lg">
+                            <i data-lucide="newspaper" class="w-6 h-6"></i>
+                        </div>
+                        <h2 class="text-2xl font-extrabold tracking-tighter">भारत<span class="text-brand-red">न्यूज़</span></h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">देश और दुनिया की सबसे तेज़, सटीक और विश्वसनीय ख़बरों का एकमात्र ठिकाना। हर पल की अपडेट के लिए जुड़े रहें हमारे साथ।</p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-gray-800 p-2 rounded-full hover:bg-brand-red transition-colors"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+                        <a href="#" class="bg-gray-800 p-2 rounded-full hover:bg-brand-red transition-colors"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                        <a href="#" class="bg-gray-800 p-2 rounded-full hover:bg-brand-red transition-colors"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4 border-l-2 border-brand-red pl-2">श्रेणियां</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('राष्ट्रीय')">राष्ट्रीय</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('अंतर्राष्ट्रीय')">अंतर्राष्ट्रीय</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('राजनीति')">राजनीति</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('व्यापार')">व्यापार</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4 border-l-2 border-brand-red pl-2">मनोरंजन और खेल</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('खेल')">खेल समाचार</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('मनोरंजन')">बॉलीवुड और टीवी</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('तकनीक')">तकनीक</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" onclick="filterCategory('धर्म')">धर्म और ज्योतिष</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-4 border-l-2 border-brand-red pl-2">हमसे जुड़ें</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">हमारे बारे में</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">संपर्क करें</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">नियम और शर्तें</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">गोपनीयता नीति</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center text-gray-500 text-sm">
+                &copy; <span id="current-year"></span> भारत न्यूज़ नेटवर्क. सर्वाधिकार सुरक्षित.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // Mock News Data (Based on current real headlines for September 2026)
+        const allNews = [
+            {
+                id: 1,
+                category: "राष्ट्रीय",
+                title: "MP के सागर में जहरीली शराब का तांडव, 4 गांवों के 10 लोगों की मौत",
+                summary: "मध्य प्रदेश के सागर जिले में जहरीली शराब पीने से 10 लोगों की मौत हो गई है। मुख्यमंत्री डॉ मोहन यादव ने सख्त कार्रवाई के निर्देश दिए हैं और हिरासत में 12 संदिग्धों को लिया गया है।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1584984647266-9e6a0d249f05?auto=format&fit=crop&w=800&q=80",
+                isBreaking: true
+            },
+            {
+                id: 2,
+                category: "राजनीति",
+                title: "PM मोदी के 'गुस्सैल फूफा' पर AAP का तंज, बोली- आईने में देखने के बाद लिखा",
+                summary: "आम आदमी पार्टी ने प्रधानमंत्री नरेंद्र मोदी के बयान पर पलटवार करते हुए तंज कसा है। राजधानी में राजनीतिक सरगर्मियां तेज हो गई हैं।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=800&q=80",
+                isBreaking: true
+            },
+            {
+                id: 3,
+                category: "खेल",
+                title: "वैभव सूर्यवंशी ने सिराज को कूटा, दलीप ट्रॉफी फाइनल में 6 रन से दिल टूटा",
+                summary: "दलीप ट्रॉफी के रोमांचक फाइनल मुकाबले में ईस्ट जोन के खिलाड़ी वैभव सूर्यवंशी ने शानदार प्रदर्शन किया, लेकिन उनकी टीम जीत से मात्र 6 रन दूर रह गई।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            },
+            {
+                id: 4,
+                category: "मनोरंजन",
+                title: "कब और कहां देख पाएंगे बिग बॉस 20, कितनी होगी प्राइज मनी? पढ़ें सभी डिटेल्स",
+                summary: "टीवी का सबसे बड़ा और विवादित रियलिटी शो बिग बॉस 20 जल्द ही शुरू होने वाला है। मेकर्स ने इस बार प्राइज मनी में बड़ा इजाफा किया है।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            },
+            {
+                id: 5,
+                category: "व्यापार",
+                title: "45 साल में नौकरी छोड़नी है तो न करें ये गलती, वरना खत्म हो जाएगा रिटायरमेंट फंड",
+                summary: "अगर आप जल्दी रिटायरमेंट की योजना बना रहे हैं, तो इन वित्तीय गलतियों से बचना बेहद जरूरी है। जानें एक्सपर्ट्स की राय।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            },
+            {
+                id: 6,
+                category: "राजनीति",
+                title: "मणिपुर में आपस में भिड़ गए दोनों डिप्टी सीएम, BJP के नेताओं के बीच टेंशन क्यों?",
+                summary: "पूर्वोत्तर राज्य मणिपुर में राजनीतिक तनाव फिर से बढ़ता जा रहा है। हाल ही में सत्ताधारी पार्टी के दो बड़े नेताओं के बीच विवाद खुलकर सामने आया है।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80",
+                isBreaking: true
+            },
+            {
+                id: 7,
+                category: "तकनीक",
+                title: "स्लीप एफएम: सोते देखकर एआई बताएगा आपकी उम्र और 130 बीमारियों का संकेत",
+                summary: "स्टैनफोर्ड यूनिवर्सिटी का नया एआई मॉडल आपके सोने के तरीके को स्कैन करके 130 से अधिक संभावित स्वास्थ्य समस्याओं का पता लगा सकता है।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            },
+            {
+                id: 8,
+                category: "धर्म",
+                title: "राहु के नक्षत्र में आकर 4 राशियों को शुक्र देंगे उम्मीद से ज्यादा अच्छे फल",
+                summary: "ज्योतिष शास्त्र के अनुसार बुध और शुक्र के गोचर से दिसंबर तक कन्या और तुला सहित 4 राशियों के जीवन में भारी आर्थिक लाभ हो सकता है।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1601314002592-b8734bca6604?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            },
+            {
+                id: 9,
+                category: "खेल",
+                title: "IND vs PAK टक्कर में किसने जीता प्लेयर ऑफ द मैच? 'डबल झटके' ने लगाए चार चांद",
+                summary: "भारत और पाकिस्तान के बीच हुए रोमांचक मुकाबले में भारतीय टीम ने शानदार जीत दर्ज की है। युवा खिलाड़ी ने मैच का रुख पलट दिया।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=800&q=80",
+                isBreaking: true
+            },
+            {
+                id: 10,
+                category: "राष्ट्रीय",
+                title: "पारंदूर के बाद नए एयरपोर्ट के लिए 2 नए ठिकाने, सरकार ने क्यों चुनीं ये साइट",
+                summary: "लगातार बढ़ते हवाई ट्रैफिक को देखते हुए सरकार ने नए ग्रीनफील्ड एयरपोर्ट्स के निर्माण को मंजूरी दे दी है। भूमि अधिग्रहण जल्द शुरू होगा।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            },
+            {
+                id: 11,
+                category: "मनोरंजन",
+                title: "'ऊपर वाले ने तय की हैं...', सुनीता के धोखे के आरोपों पर गोविंदा ने तोड़ी चुप्पी",
+                summary: "बॉलीवुड अभिनेता गोविंदा ने अपनी पत्नी सुनीता के आरोपों पर पहली बार खुलकर बात की है और फैंस से दुआओं की अपील की है।",
+                date: "06 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            },
+            {
+                id: 12,
+                category: "अंतर्राष्ट्रीय",
+                title: "चीन के इस पोर्ट सिटी में भयंकर लैंडस्लाइड, 21 लोगों की मौत, सर्च अभियान जारी",
+                summary: "चीन के शिजांग में भूस्खलन से भारी तबाही हुई है। हादसे में अब तक 21 लोगों की मौत की पुष्टि हो चुकी है, जबकि कई लोग अभी भी लापता हैं।",
+                date: "05 सितंबर 2026",
+                image: "https://images.unsplash.com/photo-1563804860434-c7eb065c7195?auto=format&fit=crop&w=800&q=80",
+                isBreaking: false
+            }
+        ];
+
+        const categories = ["होम", "ताज़ा ख़बरें", "राष्ट्रीय", "राजनीति", "अंतर्राष्ट्रीय", "खेल", "मनोरंजन", "व्यापार", "तकनीक", "धर्म"];
+        let currentCategory = "होम";
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            setCurrentDate();
+            renderNavigation();
+            renderTicker();
+            renderSidebar();
+            filterCategory('होम'); // Initial load
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileNav = document.getElementById('mobile-nav');
+            menuBtn.addEventListener('click', () => {
+                mobileNav.classList.toggle('hidden');
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const mobileSearchInput = document.getElementById('mobile-search-input');
+            
+            searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
+            mobileSearchInput.addEventListener('input', (e) => handleSearch(e.target.value));
+        });
+
+        // Set Current Date & Year
+        function setCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('hi-IN', options);
+            document.getElementById('current-date').textContent = today;
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+        }
+
+        // Render Navigation Menus
+        function renderNavigation() {
+            const deskMenu = document.getElementById('category-menu');
+            const mobMenu = document.getElementById('mobile-category-menu');
+            
+            deskMenu.innerHTML = '';
+            mobMenu.innerHTML = '';
+
+            categories.forEach(cat => {
+                // Desktop
+                const liDesk = document.createElement('li');
+                liDesk.innerHTML = `<a href="#" class="nav-link block py-3 px-1 transition-colors hover:text-brand-red ${cat === currentCategory ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</a>`;
+                deskMenu.appendChild(liDesk);
+
+                // Mobile
+                const liMob = document.createElement('li');
+                liMob.innerHTML = `<a href="#" class="block py-2 border-b border-gray-100 ${cat === currentCategory ? 'text-brand-red' : ''}" onclick="filterCategory('${cat}'); document.getElementById('mobile-nav').classList.add('hidden');">${cat}</a>`;
+                mobMenu.appendChild(liMob);
+            });
+        }
+
+        // Handle category filtering
+        function filterCategory(category) {
+            currentCategory = category;
+            document.getElementById('section-title').textContent = category;
+            
+            // Re-render nav to update active states
+            renderNavigation();
+
+            let filteredNews = [];
+            if (category === "होम") {
+                filteredNews = allNews;
+            } else if (category === "ताज़ा ख़बरें") {
+                // For demo, sort by ID descending (assuming higher ID is newer) or just show all shuffled
+                filteredNews = [...allNews].sort((a, b) => b.id - a.id);
+            } else {
+                filteredNews = allNews.filter(news => news.category === category);
+            }
+
+            displayNewsContent(filteredNews);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Handle Search
+        function handleSearch(query) {
+            const searchTerm = query.toLowerCase();
+            document.getElementById('section-title').textContent = searchTerm ? `खोज परिणाम: "${query}"` : currentCategory;
+            
+            const filteredNews = allNews.filter(news => 
+                news.title.toLowerCase().includes(searchTerm) || 
+                news.summary.toLowerCase().includes(searchTerm) ||
+                news.category.toLowerCase().includes(searchTerm)
+            );
+            
+            displayNewsContent(filteredNews);
+        }
+
+        // Display News Content (Hero + Grid)
+        function displayNewsContent(newsArray) {
+            const heroContainer = document.getElementById('hero-section');
+            const gridContainer = document.getElementById('news-grid');
+            const noResults = document.getElementById('no-results');
+
+            heroContainer.innerHTML = '';
+            gridContainer.innerHTML = '';
+
+            if (newsArray.length === 0) {
+                heroContainer.classList.add('hidden');
+                gridContainer.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            heroContainer.classList.remove('hidden');
+            gridContainer.classList.remove('hidden');
+            noResults.classList.add('hidden');
+
+            // Render Hero (First item)
+            const heroNews = newsArray[0];
+            heroContainer.innerHTML = `
+                <div class="relative h-[400px] w-full">
+                    <img src="${heroNews.image}" alt="${heroNews.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-6 w-full">
+                        <span class="inline-block bg-brand-red text-white text-xs font-bold px-3 py-1 rounded mb-3">${heroNews.category}</span>
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight group-hover:underline decoration-brand-red decoration-4 underline-offset-4">${heroNews.title}</h2>
+                        <p class="text-gray-200 text-sm md:text-base line-clamp-2 mb-3">${heroNews.summary}</p>
+                        <div class="flex items-center text-xs text-gray-400 font-semibold space-x-4">
+                            <span class="flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i> ${heroNews.date}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+
+            // Render Grid (Remaining items)
+            for (let i = 1; i < newsArray.length; i++) {
+                const news = newsArray[i];
+                const gridCard = document.createElement('div');
+                gridCard.className = "bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group cursor-pointer hover:shadow-md transition-shadow flex flex-col";
+                gridCard.innerHTML = `
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${news.image}" alt="${news.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <span class="absolute top-3 left-3 bg-brand-dark/80 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded">${news.category}</span>
+                    </div>
+                    <div class="p-4 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-brand-dark mb-2 leading-snug group-hover:text-brand-red transition-colors line-clamp-2">${news.title}</h3>
+                            <p class="text-gray-600 text-sm line-clamp-3 mb-4">${news.summary}</p>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500 font-medium pt-3 border-t border-gray-100">
+                            <span class="flex items-center"><i data-lucide="calendar" class="w-3 h-3 mr-1"></i> ${news.date}</span>
+                            <span class="text-brand-red flex items-center hover:underline">पढ़ें <i data-lucide="chevron-right" class="w-3 h-3 ml-1"></i></span>
+                        </div>
+                    </div>
+                `;
+                gridContainer.appendChild(gridCard);
+            }
+            lucide.createIcons();
+        }
+
+        // Render Sidebar (Latest News)
+        function renderSidebar() {
+            const sidebarContainer = document.getElementById('sidebar-latest');
+            // Take 5 most recent items for sidebar
+            const sidebarNews = [...allNews].slice(0, 6);
+            
+            sidebarNews.forEach(news => {
+                const item = document.createElement('div');
+                item.className = "py-3 flex space-x-3 group cursor-pointer pt-4 first:pt-0";
+                item.innerHTML = `
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+                        <img src="${news.image}" alt="${news.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold text-brand-dark leading-tight group-hover:text-brand-red transition-colors line-clamp-2 mb-1">${news.title}</h4>
+                        <p class="text-[10px] text-gray-500 font-semibold flex items-center">
+                            <i data-lucide="clock" class="w-3 h-3 mr-1"></i> ${news.date}
+                        </p>
+                    </div>
+                `;
+                sidebarContainer.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        // Render Breaking News Ticker
+        function renderTicker() {
+            const tickerContainer = document.getElementById('ticker-content');
+            const breakingNews = allNews.filter(news => news.isBreaking);
+            
+            // Duplicate content to create seamless loop
+            const tickerItems = [...breakingNews, ...breakingNews]; 
+            
+            tickerItems.forEach(news => {
+                const span = document.createElement('span');
+                span.className = "flex items-center cursor-pointer hover:underline";
+                span.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-white mr-2"></span> ${news.title}`;
+                tickerContainer.appendChild(span);
+            });
+        }
+    </script>
+</body>
+</html>
