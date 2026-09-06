@@ -267,115 +267,52 @@
     <!-- Application Logic -->
     <script>
         // Mock News Data (Based on current real headlines for September 2026)
-        const allNews = [
-            {
-                id: 1,
-                category: "राष्ट्रीय",
-                title: "MP के सागर में जहरीली शराब का तांडव, 4 गांवों के 10 लोगों की मौत",
-                summary: "मध्य प्रदेश के सागर जिले में जहरीली शराब पीने से 10 लोगों की मौत हो गई है। मुख्यमंत्री डॉ मोहन यादव ने सख्त कार्रवाई के निर्देश दिए हैं और हिरासत में 12 संदिग्धों को लिया गया है।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1584984647266-9e6a0d249f05?auto=format&fit=crop&w=800&q=80",
-                isBreaking: true
-            },
-            {
-                id: 2,
-                category: "राजनीति",
-                title: "PM मोदी के 'गुस्सैल फूफा' पर AAP का तंज, बोली- आईने में देखने के बाद लिखा",
-                summary: "आम आदमी पार्टी ने प्रधानमंत्री नरेंद्र मोदी के बयान पर पलटवार करते हुए तंज कसा है। राजधानी में राजनीतिक सरगर्मियां तेज हो गई हैं।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=800&q=80",
-                isBreaking: true
-            },
-            {
-                id: 3,
-                category: "खेल",
-                title: "वैभव सूर्यवंशी ने सिराज को कूटा, दलीप ट्रॉफी फाइनल में 6 रन से दिल टूटा",
-                summary: "दलीप ट्रॉफी के रोमांचक फाइनल मुकाबले में ईस्ट जोन के खिलाड़ी वैभव सूर्यवंशी ने शानदार प्रदर्शन किया, लेकिन उनकी टीम जीत से मात्र 6 रन दूर रह गई।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            },
-            {
-                id: 4,
-                category: "मनोरंजन",
-                title: "कब और कहां देख पाएंगे बिग बॉस 20, कितनी होगी प्राइज मनी? पढ़ें सभी डिटेल्स",
-                summary: "टीवी का सबसे बड़ा और विवादित रियलिटी शो बिग बॉस 20 जल्द ही शुरू होने वाला है। मेकर्स ने इस बार प्राइज मनी में बड़ा इजाफा किया है।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            },
-            {
-                id: 5,
-                category: "व्यापार",
-                title: "45 साल में नौकरी छोड़नी है तो न करें ये गलती, वरना खत्म हो जाएगा रिटायरमेंट फंड",
-                summary: "अगर आप जल्दी रिटायरमेंट की योजना बना रहे हैं, तो इन वित्तीय गलतियों से बचना बेहद जरूरी है। जानें एक्सपर्ट्स की राय।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            },
-            {
-                id: 6,
-                category: "राजनीति",
-                title: "मणिपुर में आपस में भिड़ गए दोनों डिप्टी सीएम, BJP के नेताओं के बीच टेंशन क्यों?",
-                summary: "पूर्वोत्तर राज्य मणिपुर में राजनीतिक तनाव फिर से बढ़ता जा रहा है। हाल ही में सत्ताधारी पार्टी के दो बड़े नेताओं के बीच विवाद खुलकर सामने आया है।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80",
-                isBreaking: true
-            },
-            {
-                id: 7,
-                category: "तकनीक",
-                title: "स्लीप एफएम: सोते देखकर एआई बताएगा आपकी उम्र और 130 बीमारियों का संकेत",
-                summary: "स्टैनफोर्ड यूनिवर्सिटी का नया एआई मॉडल आपके सोने के तरीके को स्कैन करके 130 से अधिक संभावित स्वास्थ्य समस्याओं का पता लगा सकता है।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            },
-            {
-                id: 8,
-                category: "धर्म",
-                title: "राहु के नक्षत्र में आकर 4 राशियों को शुक्र देंगे उम्मीद से ज्यादा अच्छे फल",
-                summary: "ज्योतिष शास्त्र के अनुसार बुध और शुक्र के गोचर से दिसंबर तक कन्या और तुला सहित 4 राशियों के जीवन में भारी आर्थिक लाभ हो सकता है।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1601314002592-b8734bca6604?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            },
-            {
-                id: 9,
-                category: "खेल",
-                title: "IND vs PAK टक्कर में किसने जीता प्लेयर ऑफ द मैच? 'डबल झटके' ने लगाए चार चांद",
-                summary: "भारत और पाकिस्तान के बीच हुए रोमांचक मुकाबले में भारतीय टीम ने शानदार जीत दर्ज की है। युवा खिलाड़ी ने मैच का रुख पलट दिया।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=800&q=80",
-                isBreaking: true
-            },
-            {
-                id: 10,
-                category: "राष्ट्रीय",
-                title: "पारंदूर के बाद नए एयरपोर्ट के लिए 2 नए ठिकाने, सरकार ने क्यों चुनीं ये साइट",
-                summary: "लगातार बढ़ते हवाई ट्रैफिक को देखते हुए सरकार ने नए ग्रीनफील्ड एयरपोर्ट्स के निर्माण को मंजूरी दे दी है। भूमि अधिग्रहण जल्द शुरू होगा।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            },
-            {
-                id: 11,
-                category: "मनोरंजन",
-                title: "'ऊपर वाले ने तय की हैं...', सुनीता के धोखे के आरोपों पर गोविंदा ने तोड़ी चुप्पी",
-                summary: "बॉलीवुड अभिनेता गोविंदा ने अपनी पत्नी सुनीता के आरोपों पर पहली बार खुलकर बात की है और फैंस से दुआओं की अपील की है।",
-                date: "06 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            },
-            {
-                id: 12,
-                category: "अंतर्राष्ट्रीय",
-                title: "चीन के इस पोर्ट सिटी में भयंकर लैंडस्लाइड, 21 लोगों की मौत, सर्च अभियान जारी",
-                summary: "चीन के शिजांग में भूस्खलन से भारी तबाही हुई है। हादसे में अब तक 21 लोगों की मौत की पुष्टि हो चुकी है, जबकि कई लोग अभी भी लापता हैं।",
-                date: "05 सितंबर 2026",
-                image: "https://images.unsplash.com/photo-1563804860434-c7eb065c7195?auto=format&fit=crop&w=800&q=80",
-                isBreaking: false
-            }
+        const allNews = [ // लाइव आरएसएस फ़ीड (RSS Feeds) से ऑटोमैटिक खबरें लाने का कोड
+const RSS_URL = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.amarujala.com/rss/breaking-news.xml';
+
+let allNews = [];
+const categories = ["होम", "ताज़ा ख़बरें", "राष्ट्रीय", "राजनीति", "खेल", "मनोरंजन"];
+let currentCategory = "होम";
+
+// ऑटोमैटिक लाइव खबरें फैच (Fetch) करने का फ़ंक्शन
+async function fetchLiveNews() {
+    try {
+        const response = await fetch(RSS_URL);
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            allNews = data.items.map((item, index) => ({
+                id: index + 1,
+                category: "ताज़ा ख़बरें",
+                title: item.title,
+                summary: item.description.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...',
+                date: new Date(item.pubDate).toLocaleDateString('hi-IN'),
+                image: item.enclosure.link || item.thumbnail || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800",
+                isBreaking: index < 3
+            }));
+            
+            renderTicker();
+            renderSidebar();
+            filterCategory('होम');
+        }
+    } catch (error) {
+        console.error("खबरें लोड करने में समस्या आई:", error);
+    }
+}
+
+// पेज लोड होते ही लाइव खबरें चालू होंगी
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    setCurrentDate();
+    renderNavigation();
+    fetchLiveNews(); // ऑटोमैटिक न्यूज़ लोड होगी
+
+    // मोबाइल मेनू और सर्च
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        document.getElementById('mobile-nav').classList.toggle('hidden');
+    });
+});
+            
         ];
 
         const categories = ["होम", "ताज़ा ख़बरें", "राष्ट्रीय", "राजनीति", "अंतर्राष्ट्रीय", "खेल", "मनोरंजन", "व्यापार", "तकनीक", "धर्म"];
