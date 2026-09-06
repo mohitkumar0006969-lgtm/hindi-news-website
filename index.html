@@ -267,108 +267,101 @@
     <!-- Application Logic -->
     <script>
         // Mock News Data (Based on current real headlines for September 2026)
-        const allNews = [ // लाइव आरएसएस फ़ीड (RSS Feeds) से ऑटोमैटिक खबरें लाने का कोड
-const RSS_URL = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.amarujala.com/rss/breaking-news.xml';
+        const allNews = [ <!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>भारत न्यूज़ | ताज़ा ख़बरें</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
 
-let allNews = [];
-const categories = ["होम", "ताज़ा ख़बरें", "राष्ट्रीय", "राजनीति", "खेल", "मनोरंजन"];
-let currentCategory = "होम";
+    <!-- Header -->
+    <header class="bg-white p-4 shadow border-b-2 border-red-600">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-black text-red-600">🔴 भारत <span class="text-gray-900">न्यूज़</span></h1>
+            <span class="text-xs text-green-600 font-bold bg-green-100 px-2 py-1 rounded">● लाइव ऑटो फ़ीड</span>
+        </div>
+    </header>
 
-// ऑटोमैटिक लाइव खबरें फैच (Fetch) करने का फ़ंक्शन
-async function fetchLiveNews() {
-    try {
-        const response = await fetch(RSS_URL);
-        const data = await response.json();
-        
-        if (data.status === 'ok') {
-            allNews = data.items.map((item, index) => ({
-                id: index + 1,
-                category: "ताज़ा ख़बरें",
-                title: item.title,
-                summary: item.description.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...',
-                date: new Date(item.pubDate).toLocaleDateString('hi-IN'),
-                image: item.enclosure.link || item.thumbnail || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800",
-                isBreaking: index < 3
-            }));
+    <!-- Breaking Bar -->
+    <div class="bg-red-600 text-white py-2 px-4 font-bold text-sm">
+        <div class="max-w-4xl mx-auto flex items-center gap-2">
+            <span class="bg-white text-red-600 text-xs px-2 py-0.5 rounded uppercase">ब्रेकिंग न्यूज़</span>
+            <div id="ticker" class="truncate font-normal">ताज़ा खबरें लोड हो रही हैं...</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto p-4">
+        <h2 class="text-2xl font-bold mb-4 border-l-4 border-red-600 pl-2">होम</h2>
+
+        <!-- News Container -->
+        <div class="bg-white p-4 rounded-lg shadow mb-6">
+            <h3 class="text-xl font-bold text-red-600 mb-4 border-b pb-2">
+                ● ताज़ा ख़बरें
+            </h3>
             
-            renderTicker();
-            renderSidebar();
-            filterCategory('होम');
+            <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p class="text-gray-500 col-span-2 text-center py-6">ताज़ा समाचार लोड हो रहे हैं...</p>
+            </div>
+        </div>
+
+        <!-- Ad Space -->
+        <div class="bg-gray-200 p-8 rounded-lg text-center text-gray-500 font-bold border border-dashed border-gray-400">
+            विज्ञापन (Ad Space)
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white text-center py-6 mt-8 text-sm">
+        <p class="font-bold text-red-500">🔴 भारत न्यूज़</p>
+        <p class="text-gray-400 text-xs mt-1">देश और दुनिया की सबसे तेज़, सटीक और विश्वसनीय ख़बरों का एकमात्र स्रोत</p>
+    </footer>
+
+    <!-- Auto Fetch Script -->
+    <script>
+        async function loadRSS() {
+            const feedUrl = 'https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss?hl=hi&gl=IN&ceid=IN:hi';
+            try {
+                const res = await fetch(feedUrl);
+                const data = await res.json();
+                
+                if (data.status === 'ok' && data.items.length > 0) {
+                    document.getElementById('ticker').innerText = data.items[0].title;
+                    
+                    const newsList = document.getElementById('news-list');
+                    newsList.innerHTML = data.items.slice(0, 10).map(item => `
+                        <div class="border rounded-lg p-3 hover:shadow-md transition bg-gray-50 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-base text-gray-900 mb-2">${item.title}</h4>
+                                <p class="text-xs text-gray-500 mb-2">${new Date(item.pubDate).toLocaleString('hi-IN')}</p>
+                            </div>
+                            <a href="${item.link}" target="_blank" class="text-xs text-red-600 font-bold hover:underline mt-2 inline-block">पूरी खबर पढ़ें &rarr;</a>
+                        </div>
+                    `).join('');
+                } else {
+                    showError();
+                }
+            } catch (err) {
+                showError();
+            }
         }
-    } catch (error) {
-        console.error("खबरें लोड करने में समस्या आई:", error);
-    }
-}
 
-// पेज लोड होते ही लाइव खबरें चालू होंगी
-document.addEventListener('DOMContentLoaded', () => {
-    lucide.createIcons();
-    setCurrentDate();
-    renderNavigation();
-    fetchLiveNews(); // ऑटोमैटिक न्यूज़ लोड होगी
-
-    // मोबाइल मेनू और सर्च
-    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-        document.getElementById('mobile-nav').classList.toggle('hidden');
-    });
-});
-            
-        ];
-
-        const categories = ["होम", "ताज़ा ख़बरें", "राष्ट्रीय", "राजनीति", "अंतर्राष्ट्रीय", "खेल", "मनोरंजन", "व्यापार", "तकनीक", "धर्म"];
-        let currentCategory = "होम";
-
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            setCurrentDate();
-            renderNavigation();
-            renderTicker();
-            renderSidebar();
-            filterCategory('होम'); // Initial load
-
-            // Mobile menu toggle
-            const menuBtn = document.getElementById('mobile-menu-btn');
-            const mobileNav = document.getElementById('mobile-nav');
-            menuBtn.addEventListener('click', () => {
-                mobileNav.classList.toggle('hidden');
-            });
-
-            // Search functionality
-            const searchInput = document.getElementById('search-input');
-            const mobileSearchInput = document.getElementById('mobile-search-input');
-            
-            searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
-            mobileSearchInput.addEventListener('input', (e) => handleSearch(e.target.value));
-        });
-
-        // Set Current Date & Year
-        function setCurrentDate() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const today = new Date().toLocaleDateString('hi-IN', options);
-            document.getElementById('current-date').textContent = today;
-            document.getElementById('current-year').textContent = new Date().getFullYear();
+        function showError() {
+            document.getElementById('ticker').innerText = "लाइव फ़ीड लोड करने में समस्या आई।";
+            document.getElementById('news-list').innerHTML = `
+                <div class="col-span-2 text-center py-4 text-red-500">
+                    खबरें लोड नहीं हो सकीं। कृपया रीफ़्रेश करें।
+                </div>
+            `;
         }
 
-        // Render Navigation Menus
-        function renderNavigation() {
-            const deskMenu = document.getElementById('category-menu');
-            const mobMenu = document.getElementById('mobile-category-menu');
-            
-            deskMenu.innerHTML = '';
-            mobMenu.innerHTML = '';
-
-            categories.forEach(cat => {
-                // Desktop
-                const liDesk = document.createElement('li');
-                liDesk.innerHTML = `<a href="#" class="nav-link block py-3 px-1 transition-colors hover:text-brand-red ${cat === currentCategory ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</a>`;
-                deskMenu.appendChild(liDesk);
-
-                // Mobile
-                const liMob = document.createElement('li');
-                liMob.innerHTML = `<a href="#" class="block py-2 border-b border-gray-100 ${cat === currentCategory ? 'text-brand-red' : ''}" onclick="filterCategory('${cat}'); document.getElementById('mobile-nav').classList.add('hidden');">${cat}</a>`;
-                mobMenu.appendChild(liMob);
-            });
+        document.addEventListener('DOMContentLoaded', loadRSS);
+    </script>
+</body>
+</html>
         }
 
         // Handle category filtering
